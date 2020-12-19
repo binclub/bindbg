@@ -1,0 +1,18 @@
+plugins {
+    id 'java'
+}
+
+group 'dev.binclub'
+version '1.0'
+
+repositories {
+    mavenCentral()
+	maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+	implementation "com.github.weisj.darklaf:darklaf-core:master-SNAPSHOT"
+	implementation "com.github.weisj.darklaf:darklaf-windows:master-SNAPSHOT"
+	implementation "com.github.weisj.darklaf:darklaf-macos:master-SNAPSHOT"
+	implementation "com.github.weisj.darklaf:darklaf-theme:master-SNAPSHOT"
+}
