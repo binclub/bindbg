@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>dev.binclub</groupId>
+  <artifactId>bindbg</artifactId>
+  <version>1.0</version>
+
+  <properties>
+    <darklaf.version>LATEST</darklaf.version>
+    <bincode.version>master-SNAPSHOT</bincode.version>
+
+    <java.version>15</java.version>
+    <maven.compiler.source>15</maven.compiler.source>
+    <maven.compiler.target>15</maven.compiler.target>
+
+    <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
+    <kotlin.compiler.jvmTarget>15</kotlin.compiler.jvmTarget>
+
+    <main.class>dev.binclub.bindbg.BinDbg</main.class>
+  </properties>
+
+  <repositories>
+    <repository>
+      <id>jitpack</id>
+      <name>jitpack</name>
+      <url>https://jitpack.io</url>
+    </repository>
+    <repository>
+      <id>sonatype</id>
+      <name>sonatype</name>
+      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+    </repository>
+  </repositories>
+
+  <build>
+    <finalName>${project.artifactId}</finalName>
+    <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.5.1</version>
+        <executions>
+          <!-- Replacing default-compile as it is treated specially by maven -->
+          <execution>
+            <id>default-compile</id>
+            <phase>none</phase>
+          </execution>
+          <execution>
+            <id>java-compile</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.2.4</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer"/>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer">
+                  <addHeader>true</addHeader>
+                </transformer>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>${main.class}</mainClass>
+                </transformer>
+              </transformers>
+              <filters>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/*.SF</exclude>
+                    <exclude>META-INF/*.DSA</exclude>
+                    <exclude>META-INF/*.RSA</exclude>
+                  </excludes>
+                </filter>
+              </filters>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.github.weisj</groupId>
+      <artifactId>darklaf-core</artifactId>
+      <version>${darklaf.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.weisj</groupId>
+      <artifactId>darklaf-theme</artifactId>
+      <version>${darklaf.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.weisj</groupId>
+      <artifactId>darklaf-windows</artifactId>
+      <version>${darklaf.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.weisj</groupId>
+      <artifactId>darklaf-macos</artifactId>
+      <version>${darklaf.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.x4e</groupId>
+      <artifactId>BinCode</artifactId>
+      <version>${bincode.version}</version>
+    </dependency>
+  </dependencies>
+</project>
