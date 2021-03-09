@@ -1,18 +1,25 @@
 package dev.binclub.bindbg.gui;
 
-import com.sun.jdi.connect.IllegalConnectorArgumentsException;
 import dev.binclub.bindbg.connection.VmConnection;
 import dev.binclub.bindbg.util.SwingUtils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.IOException;
 
 public class ConnectionWindow extends JFrame {
 	JTextField ip = new JTextField();
 	JTextField port = new JTextField();
 	
 	public ConnectionWindow() {
+		System.out.println(System.getProperty("java.version"));
+		
+		
+		var gs = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+		var gc = gs.getDefaultConfiguration();
+		System.out.println(gc);
+		System.out.println(gs);
+		System.out.println(gc.getDefaultTransform());
+		
 		this.setTitle("BinDbg");
 		this.setLayout(new BorderLayout());
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

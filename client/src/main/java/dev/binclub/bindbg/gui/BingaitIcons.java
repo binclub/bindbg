@@ -12,8 +12,10 @@ import java.net.URL;
 public class BingaitIcons {
 	public static Image openFileIcon = load("openfile", 30, 30);
 	public static Image pauseIcon = load("pause", 30, 30);
+	public static Image pauseAltIcon = load("pause_alt", 30, 30);
 	public static Image restartIcon = load("restart", 30, 30);
 	public static Image resumeIcon = load("resume", 30, 30);
+	public static Image resumeAltIcon = load("resume_alt", 30, 30);
 	public static Image singleStepIcon = load("single_step", 30, 30);
 	public static Image stepJavaIcon = load("step_java", 30, 30);
 	public static Image stepOutIcon = load("step_out", 30, 30);

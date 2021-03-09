@@ -3,7 +3,6 @@ package dev.binclub.bindbg;
 import com.github.weisj.darklaf.LafManager;
 import com.github.weisj.darklaf.theme.DarculaTheme;
 import dev.binclub.bindbg.gui.ConnectionWindow;
-import dev.binclub.bindbg.gui.MainWindow;
 import dev.binclub.bindbg.util.SwingUtils;
 
 public class BinDbg {

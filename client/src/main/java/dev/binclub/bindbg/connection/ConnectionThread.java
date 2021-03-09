@@ -1,7 +1,5 @@
 package dev.binclub.bindbg.connection;
 
-import dev.binclub.bindbg.connection.event.VmDisconnectEvent;
-
 public class ConnectionThread extends Thread {
 	private final VmConnection vm;
 	
@@ -19,10 +17,16 @@ public class ConnectionThread extends Thread {
 	public void run() {
 		while (true) {
 			try {
-				if (active && vm.isDead()) {
+				if (!active) break;
+				
+				if (vm.isDead()) {
 					active = false;
-					vm.eventManager.dispatch(new VmDisconnectEvent());
 					break;
+				}
+				
+				for (var event : vm.pollEvents()) {
+					System.out.println(event);
+					vm.eventManager.dispatch(event);
 				}
 			} catch (Throwable t) {
 				t.printStackTrace();
