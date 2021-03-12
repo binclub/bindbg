@@ -5,6 +5,9 @@ import com.sun.jdi.event.VMDisconnectEvent;
 import dev.binclub.bindbg.connection.VmConnection;
 import dev.binclub.bindbg.connection.event.VmPauseEvent;
 import dev.binclub.bindbg.connection.event.VmResumeEvent;
+import dev.binclub.bindbg.gui.components.ControlBar;
+import dev.binclub.bindbg.gui.components.state.BytecodePanel;
+import dev.binclub.bindbg.gui.components.state.StatePanel;
 import dev.binclub.bindbg.util.SwingUtils;
 
 import javax.swing.*;
@@ -14,7 +17,7 @@ public class MainWindow extends JFrame {
 	private final VmConnection vm;
 	private boolean purposefullyClosed;
 	private final ControlBar controlBar;
-	private final BytecodePanel bytecodePanel;
+	private final StatePanel statePanel;
 	
 	public MainWindow(VmConnection vm) {
 		this.vm = vm;
@@ -29,8 +32,8 @@ public class MainWindow extends JFrame {
 		controlBar = new ControlBar(vm);
 		inner.add(controlBar, BorderLayout.NORTH);
 		
-		bytecodePanel = new BytecodePanel(vm);
-		inner.add(bytecodePanel, BorderLayout.CENTER);
+		statePanel = new StatePanel(vm);
+		inner.add(statePanel, BorderLayout.CENTER);
 		
 		this.add(inner);
 		
@@ -44,7 +47,7 @@ public class MainWindow extends JFrame {
 	
 	private void refresh() {
 		controlBar.refresh();
-		bytecodePanel.refresh();
+		statePanel.refresh();
 	}
 	
 	private void close() {

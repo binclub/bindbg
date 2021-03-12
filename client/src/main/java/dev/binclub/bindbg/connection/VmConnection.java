@@ -3,7 +3,6 @@ package dev.binclub.bindbg.connection;
 import com.sun.jdi.*;
 import com.sun.jdi.connect.IllegalConnectorArgumentsException;
 import com.sun.jdi.event.Event;
-import com.sun.jdi.event.EventSet;
 import com.sun.jdi.request.EventRequest;
 import com.sun.jdi.request.StepRequest;
 import dev.binclub.bindbg.connection.event.VmEventManager;
@@ -12,7 +11,10 @@ import dev.binclub.bindbg.connection.event.VmResumeEvent;
 import dev.binclub.bindbg.gui.context.DebugContext;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static dev.binclub.bindbg.connection.VmUtils.connect;
@@ -23,10 +25,11 @@ public class VmConnection {
 	public final DebugContext debugContext;
 	
 	private final VirtualMachine vm;
-	private final AtomicBoolean suspended = new AtomicBoolean(false);
+	private final VMState state;
 	
 	public VmConnection(String host, int port) throws IOException, IllegalConnectorArgumentsException {
 		vm = connect(host, port);
+		state = VMState.get(vm);
 		debugContext = new DebugContext();
 		conThread = new ConnectionThread(this);
 		eventManager = new VmEventManager();
@@ -45,26 +48,34 @@ public class VmConnection {
 		return name();
 	}
 	
+	public List<ThreadReference> threads() {
+		return vm.allThreads();
+	}
+	
 	public boolean resume() {
-		if (suspended.compareAndSet(true, false)) {
+		if (isSuspended()) {
 			vm.resume();
 			eventManager.dispatch(new VmResumeEvent());
+			System.out.println("Resumed");
 			return true;
 		}
+		System.out.println("Not Resumed");
 		return false;
 	}
 	
 	public boolean suspend() {
-		if (suspended.compareAndSet(false, true)) {
+		if (isSuspended()) {
 			vm.suspend();
 			eventManager.dispatch(new VmPauseEvent());
+			System.out.println("Paused");
 			return true;
 		}
+		System.out.println("Not Paused");
 		return false;
 	}
 	
 	public boolean isSuspended() {
-		return suspended.get();
+		return state.isSuspended();
 	}
 	
 	public void stepInto(ThreadReference thread) {
@@ -122,6 +133,54 @@ public class VmConnection {
 				vm.dispose();
 			} catch (VMDisconnectedException ignored) {}
 			dead = true;
+		}
+	}
+	
+	/**
+	 * Wrapper class for the private com.sun.tools.jdi.VMState class
+	 */
+	private static class VMState {
+		private static MethodHandle stateGet;
+		private static MethodHandle isSuspendedMeth;
+		
+		static {
+			try {
+				var lookup = MethodHandles.lookup();
+				var vmImpl = Class.forName("com.sun.tools.jdi.VirtualMachineImpl");
+				var stateCls = Class.forName("com.sun.tools.jdi.VMState");
+				
+				var stateField = vmImpl.getDeclaredField("state");
+				stateField.setAccessible(true);
+				stateGet = lookup.unreflectGetter(stateField);
+				
+				var isSuspended = stateCls.getDeclaredMethod("isSuspended");
+				isSuspended.setAccessible(true);
+				isSuspendedMeth = lookup.unreflect(isSuspended);
+			} catch (Throwable t) {
+				t.printStackTrace();
+			}
+		}
+		
+		public static VMState get(VirtualMachine vm) {
+			try {
+				return new VMState(stateGet.invoke(vm));
+			} catch (Throwable throwable) {
+				throw new RuntimeException(throwable);
+			}
+		}
+		
+		private final Object inner;
+		
+		private VMState(Object inner) {
+			this.inner = inner;
+		}
+		
+		public boolean isSuspended() {
+			try {
+				return (boolean) isSuspendedMeth.invoke(inner);
+			} catch (Throwable throwable) {
+				throw new RuntimeException(throwable);
+			}
 		}
 	}
 }

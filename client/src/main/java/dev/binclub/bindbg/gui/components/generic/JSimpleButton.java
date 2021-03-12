@@ -1,4 +1,4 @@
-package dev.binclub.bindbg.gui.components;
+package dev.binclub.bindbg.gui.components.generic;
 
 import javax.swing.*;
 

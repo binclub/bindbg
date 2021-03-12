@@ -1,7 +1,9 @@
-package dev.binclub.bindbg.gui;
+package dev.binclub.bindbg.gui.components;
 
+import com.sun.jdi.ThreadReference;
 import dev.binclub.bindbg.connection.VmConnection;
-import dev.binclub.bindbg.gui.components.JSimpleButton;
+import dev.binclub.bindbg.gui.BingaitIcons;
+import dev.binclub.bindbg.gui.components.generic.JSimpleButton;
 import dev.binclub.bindbg.gui.context.DebugContext;
 
 import javax.swing.*;
@@ -23,6 +25,8 @@ public class ControlBar extends JPanel {
 	private final JSimpleButton stepOverBtn;
 	private final JSimpleButton stepOutBtn;
 	private final JSimpleButton stepJavaBtn;
+	
+	private final JComboBox<ThreadReference> threadBox = new JComboBox<>();
 	
 	public ControlBar(VmConnection vm) {
 		this.vm = vm;
@@ -79,15 +83,42 @@ public class ControlBar extends JPanel {
 			System.out.println("Step Java execution");
 		});
 		this.add(stepJavaBtn);
+		
+		threadBox.setRenderer(new DefaultListCellRenderer () {
+			@Override
+			public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+				if (value instanceof ThreadReference) {
+					ThreadReference ref = (ThreadReference) value;
+					value = ref.name() + "@" + ref.uniqueID();
+				}
+				return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+			}
+		});
+		threadBox.addActionListener((e) -> {
+			ThreadReference selected = (ThreadReference) threadBox.getSelectedItem();
+			DebugContext ctx = vm.debugContext;
+			if (ctx.debuggingThread != selected) {
+				ctx.debuggingThread = selected;
+				refresh();
+			}
+		});
+		this.add(threadBox);
 	}
 	
 	public void refresh() {
 		if (vm.isSuspended()) {
 			pauseBtn.setIcon(pauseAltIcon);
 			resumeBtn.setIcon(resumeIcon);
+			
+			threadBox.removeAllItems();
+			for (ThreadReference thread : vm.threads()) {
+				threadBox.addItem(thread);
+			}
 		} else {
 			pauseBtn.setIcon(pauseIcon);
 			resumeBtn.setIcon(resumeAltIcon);
+			
+			threadBox.removeAllItems();
 		}
 	}
 }

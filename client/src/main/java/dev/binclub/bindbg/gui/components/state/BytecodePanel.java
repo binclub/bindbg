@@ -1,4 +1,4 @@
-package dev.binclub.bindbg.gui;
+package dev.binclub.bindbg.gui.components.state;
 
 import dev.binclub.bincode.parsing.ConstantPoolParser;
 import dev.binclub.bincode.types.ClassVersion;
@@ -25,7 +25,7 @@ public class BytecodePanel extends JPanel {
 		if (!vm.isSuspended()) return;
 		
 		try {
-			DebugContext context = vm.debugContext;
+			var context = vm.debugContext;
 			if (context.debuggingThread == null) return;
 			var loc = context.debuggingThread.frame(0).location();
 			var clazz = loc.declaringType();
@@ -36,10 +36,12 @@ public class BytecodePanel extends JPanel {
 			);
 			var version = new ClassVersion(clazz.minorVersion(), clazz.majorVersion());
 			var bytes = method.bytecodes();
-			try (var fs = new FileOutputStream(new File(clazz.name() + ".class"))) {
+			File dbgFile = new File(clazz.name() + ".class");
+			System.out.println(dbgFile.getAbsolutePath());
+			try (var fs = new FileOutputStream(dbgFile)) {
 				fs.write(bytes);
 			}
-			//System.out.println(bytecode);
+			System.out.println("Wrote " + clazz.name() + "." + method.name() + " (" + bytes.length + " bytes)");
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}
