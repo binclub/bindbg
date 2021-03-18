@@ -2,7 +2,6 @@ package dev.binclub.bindbg.gui.components.state;
 
 import com.sun.jdi.StackFrame;
 import dev.binclub.bindbg.connection.VmConnection;
-import dev.binclub.bindbg.gui.context.DebugContext;
 
 import javax.swing.*;
 
