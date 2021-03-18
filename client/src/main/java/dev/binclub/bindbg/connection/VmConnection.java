@@ -64,7 +64,7 @@ public class VmConnection {
 	}
 	
 	public boolean suspend() {
-		if (isSuspended()) {
+		if (!isSuspended()) {
 			vm.suspend();
 			eventManager.dispatch(new VmPauseEvent());
 			System.out.println("Paused");

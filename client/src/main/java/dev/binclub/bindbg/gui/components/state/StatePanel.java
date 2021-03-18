@@ -14,10 +14,11 @@ public class StatePanel extends JSplitPane {
 	private final StackPanel stack;
 	
 	public StatePanel(VmConnection vm) {
+		super(JSplitPane.HORIZONTAL_SPLIT);
 		bytecode = new BytecodePanel(vm);
 		stack = new StackPanel(vm);
-		this.add(bytecode);
-		this.add(stack);
+		this.setLeftComponent(bytecode);
+		this.setRightComponent(stack);
 		this.setDividerLocation(0.75);
 	}
 	

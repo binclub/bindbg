@@ -87,16 +87,16 @@ public class ControlBar extends JPanel {
 		threadBox.setRenderer(new DefaultListCellRenderer () {
 			@Override
 			public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-				if (value instanceof ThreadReference) {
-					ThreadReference ref = (ThreadReference) value;
-					value = ref.name() + "@" + ref.uniqueID();
-				}
-				return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+			if (value instanceof ThreadReference) {
+				ThreadReference ref = (ThreadReference) value;
+				value = ref.name() + "@" + ref.uniqueID();
+			}
+			return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			}
 		});
 		threadBox.addActionListener((e) -> {
-			ThreadReference selected = (ThreadReference) threadBox.getSelectedItem();
-			DebugContext ctx = vm.debugContext;
+			var selected = (ThreadReference) threadBox.getSelectedItem();
+			var ctx = vm.debugContext;
 			if (ctx.debuggingThread != selected) {
 				ctx.debuggingThread = selected;
 				refresh();
@@ -110,14 +110,26 @@ public class ControlBar extends JPanel {
 			pauseBtn.setIcon(pauseAltIcon);
 			resumeBtn.setIcon(resumeIcon);
 			
+			var prevSelected = vm.debugContext.debuggingThread;
+			vm.debugContext.debuggingThread = null;
+			
+			threadBox.setEnabled(true);
 			threadBox.removeAllItems();
-			for (ThreadReference thread : vm.threads()) {
+			for (var thread : vm.threads()) {
 				threadBox.addItem(thread);
+				
+				// This way we will only select the previously selected thread if it is
+				// both non null and still a valid thread
+				if (thread == prevSelected) {
+					threadBox.setSelectedItem(thread);
+					vm.debugContext.debuggingThread = thread;
+				}
 			}
 		} else {
 			pauseBtn.setIcon(pauseIcon);
 			resumeBtn.setIcon(resumeAltIcon);
 			
+			threadBox.setEnabled(false);
 			threadBox.removeAllItems();
 		}
 	}
