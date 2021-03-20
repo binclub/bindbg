@@ -14,9 +14,6 @@
     <maven.compiler.source>15</maven.compiler.source>
     <maven.compiler.target>15</maven.compiler.target>
 
-    <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
-    <kotlin.compiler.jvmTarget>15</kotlin.compiler.jvmTarget>
-
     <main.class>dev.binclub.bindbg.BinDbg</main.class>
   </properties>
 
@@ -115,11 +112,6 @@
       <groupId>com.github.weisj</groupId>
       <artifactId>darklaf-macos</artifactId>
       <version>${darklaf.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.github.x4e</groupId>
-      <artifactId>BinCode</artifactId>
-      <version>${bincode.version}</version>
     </dependency>
   </dependencies>
 </project>

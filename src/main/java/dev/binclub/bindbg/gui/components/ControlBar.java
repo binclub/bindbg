@@ -4,7 +4,6 @@ import com.sun.jdi.ThreadReference;
 import dev.binclub.bindbg.connection.VmConnection;
 import dev.binclub.bindbg.gui.BingaitIcons;
 import dev.binclub.bindbg.gui.components.generic.JSimpleButton;
-import dev.binclub.bindbg.gui.context.DebugContext;
 
 import javax.swing.*;
 import java.awt.*;

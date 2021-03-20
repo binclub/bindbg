@@ -2,7 +2,6 @@ package dev.binclub.bindbg.gui.components.state;
 
 import com.sun.jdi.StackFrame;
 import dev.binclub.bindbg.connection.VmConnection;
-import dev.binclub.bindbg.util.StringUtils;
 
 import javax.swing.*;
 
@@ -14,14 +13,14 @@ import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 import static javax.swing.ScrollPaneConstants.*;
 
 /**
- * Shows the JVM stack including the call stack, the data stack and the local variables
+ * Shows the JVM call stack
  */
-public class StackPanel extends JPanel {
+public class StackFramePanel extends JPanel {
 	private final VmConnection vm;
 	private final DefaultListModel<StackFrame> callStackModel;
 	private final JList<StackFrame> callStacks;
 	
-	public StackPanel(VmConnection vm) {
+	public StackFramePanel(VmConnection vm) {
 		this.vm = vm;
 		
 		this.callStackModel = new DefaultListModel<>();
@@ -42,11 +41,14 @@ public class StackPanel extends JPanel {
 			}
 		});
 		
-		var scrollPane = new JScrollPane(callStacks);
-		scrollPane.setVerticalScrollBarPolicy(VERTICAL_SCROLLBAR_ALWAYS);
-		scrollPane.setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_ALWAYS);
-		scrollPane.setPreferredSize(new Dimension(750, 150));
-		this.add(scrollPane);
+		var scrollPane = new JScrollPane(
+			callStacks,
+			JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, 
+			JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED
+		);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		this.setLayout(new BorderLayout());
+		this.add(scrollPane, BorderLayout.CENTER);
 	}
 	
 	public void refresh() {

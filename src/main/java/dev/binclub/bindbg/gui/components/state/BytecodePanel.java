@@ -1,7 +1,5 @@
 package dev.binclub.bindbg.gui.components.state;
 
-import dev.binclub.bincode.parsing.ConstantPoolParser;
-import dev.binclub.bincode.types.ClassVersion;
 import dev.binclub.bindbg.connection.VmConnection;
 import dev.binclub.bindbg.connection.event.VmPauseEvent;
 import dev.binclub.bindbg.gui.context.DebugContext;
@@ -30,11 +28,11 @@ public class BytecodePanel extends JPanel {
 			var loc = context.debuggingThread.frame(0).location();
 			var clazz = loc.declaringType();
 			var method = loc.method();
-			var cp = ConstantPoolParser.INSTANCE.parse(
+			/*var cp = ConstantPoolParser.INSTANCE.parse(
 				new DataInputStream(new ByteArrayInputStream(clazz.constantPool())),
 				clazz.constantPoolCount()
 			);
-			var version = new ClassVersion(clazz.minorVersion(), clazz.majorVersion());
+			var version = new ClassVersion(clazz.minorVersion(), clazz.majorVersion());*/
 			var bytes = method.bytecodes();
 			File dbgFile = new File(clazz.name() + ".class");
 			System.out.println(dbgFile.getAbsolutePath());
