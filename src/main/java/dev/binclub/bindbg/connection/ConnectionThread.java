@@ -19,14 +19,14 @@ public class ConnectionThread extends Thread {
 			try {
 				if (!active) break;
 				
+				// We can still have some queued events even if the vm is dead
+				for (var event : vm.pollEvents()) {
+					vm.eventManager.dispatch(event);
+				}
+				
 				if (vm.isDead()) {
 					active = false;
 					break;
-				}
-				
-				for (var event : vm.pollEvents()) {
-					System.out.println(event);
-					vm.eventManager.dispatch(event);
 				}
 			} catch (Throwable t) {
 				t.printStackTrace();

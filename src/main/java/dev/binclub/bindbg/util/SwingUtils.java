@@ -5,9 +5,11 @@ import java.awt.*;
 public class SwingUtils {
 	public static void putWindowInMouseScreen(Window window, int height) {
 		var activeScreen = SwingUtils.findActiveScreen();
-		window.setBounds(activeScreen);
-		float aspect = 1920f / 1080f;
-		window.setSize((int) (height * aspect), height);
+		if (activeScreen != null) {
+			window.setBounds(activeScreen);
+			float aspect = 1920f / 1080f;
+			window.setSize((int) (height * aspect), height);
+		}
 	}
 	
 	public static Rectangle findActiveScreen() {
@@ -15,16 +17,20 @@ public class SwingUtils {
 	}
 	
 	public static Rectangle screenAtPoint(Point point) {
-		var ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+		var screenDevices = GraphicsEnvironment.getLocalGraphicsEnvironment()
+			.getScreenDevices();
 		
-		for (GraphicsDevice device : ge.getScreenDevices()) {
+		for (GraphicsDevice device : screenDevices) {
 			var bounds = device.getDefaultConfiguration().getBounds();
 			if (bounds.contains(point)) {
 				return bounds;
 			}
 		}
 		
-		// First available monitor
-		return ge.getScreenDevices()[0].getDefaultConfiguration().getBounds();
+		if (screenDevices.length > 0) {
+			// First available monitor
+			return screenDevices[0].getDefaultConfiguration().getBounds();
+		}
+		return null;
 	}
 }

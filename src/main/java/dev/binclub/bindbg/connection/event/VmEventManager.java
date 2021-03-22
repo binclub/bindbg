@@ -1,10 +1,7 @@
 package dev.binclub.bindbg.connection.event;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -13,37 +10,53 @@ import java.util.function.Consumer;
  * This means that event subscribers will receive events indefinitely until they are garbage collected
  */
 public class VmEventManager {
-	private Map<Class, List<Object[]>> listeners = new HashMap<>();
+	private final Map<Class<?>, List<WeakReference<?>[]>> listeners = new HashMap<>();
+	private final ThreadLocal<Set<Class<?>>> hierarchyCache = ThreadLocal.withInitial(HashSet::new);
 	
 	public <T> void subscribe(Object subscriber, Class<T> clazz, Consumer<T> runnable) {
 		var list = listeners.computeIfAbsent(clazz, k -> new ArrayList<>());
-		list.add(new Object[] {
+		list.add(new WeakReference[] {
 			new WeakReference<>(subscriber),
 			new WeakReference<>(runnable)
 		});
 	}
 	
-	public void dispatch(Object event) {
-		Class clazz = event.getClass();
-		while (clazz != null) {
-			var list = listeners.get(clazz);
+	public <T> void dispatch(T event) {
+		var hierarchy = hierarchyCache.get();
+		try {
+			{Class<?> clazz = event.getClass();
+			while (clazz != null) {
+				hierarchy.add(clazz);
+				// Underneath HashSet it just does this anyway, except we will have to box the array into a List
+				// Doing it this way should be faster
+				//noinspection ManualArrayToCollectionCopy
+				for (Class<?> inter : clazz.getInterfaces()) {
+					//noinspection UseBulkOperation
+					hierarchy.add(inter);
+				}
+				clazz = clazz.getSuperclass();
+			}}
 			
-			if (list != null) {
-				list.removeIf((arr) -> {
-					var subscriber = ((WeakReference<Object>) arr[0]).get();
-					if (subscriber != null) { // has it been garbage collected?
-						var runnable = ((WeakReference<Consumer>) arr[1]).get();
-						if (runnable != null) runnable.accept(event);
-						return false;
-					}
-					else {
-						System.out.println("Unsubscribed " + subscriber + ((WeakReference<Consumer>) arr[1]).get());
-						return true;
-					}
-				});
+			for (Class<?> clazz : hierarchy) {
+				var list = listeners.get(clazz);
+				
+				if (list != null) {
+					Class<?> finalClazz = clazz;
+					list.removeIf((arr) -> {
+						var subscriber = (Object) arr[0].get();
+						var runnable = (Consumer<T>) arr[1].get();
+						if (subscriber != null && runnable != null) { // has it been garbage collected?
+							runnable.accept(event);
+							return false;
+						} else {
+							System.out.println("Unsubscribed " + finalClazz);
+							return true;
+						}
+					});
+				}
 			}
-			
-			clazz = clazz.getSuperclass();
+		} finally {
+			hierarchy.clear();
 		}
 	}
 }

@@ -2,7 +2,9 @@ package dev.binclub.bindbg.gui.components;
 
 import com.sun.jdi.ThreadReference;
 import dev.binclub.bindbg.connection.VmConnection;
+import dev.binclub.bindbg.event.ThreadSelectedEvent;
 import dev.binclub.bindbg.gui.BingaitIcons;
+import dev.binclub.bindbg.gui.MainWindow;
 import dev.binclub.bindbg.gui.components.generic.JSimpleButton;
 
 import javax.swing.*;
@@ -98,7 +100,8 @@ public class ControlBar extends JPanel {
 			var ctx = vm.debugContext;
 			if (ctx.debuggingThread != selected) {
 				ctx.debuggingThread = selected;
-				refresh();
+				// Event will refresh the state panels
+				vm.eventManager.dispatch(new ThreadSelectedEvent(selected));
 			}
 		});
 		this.add(threadBox);
@@ -128,8 +131,8 @@ public class ControlBar extends JPanel {
 			pauseBtn.setIcon(pauseIcon);
 			resumeBtn.setIcon(resumeAltIcon);
 			
-			threadBox.setEnabled(false);
 			threadBox.removeAllItems();
+			threadBox.setEnabled(false);
 		}
 	}
 }

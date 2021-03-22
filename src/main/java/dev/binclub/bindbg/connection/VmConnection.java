@@ -56,10 +56,8 @@ public class VmConnection {
 		if (isSuspended()) {
 			vm.resume();
 			eventManager.dispatch(new VmResumeEvent());
-			System.out.println("Resumed");
 			return true;
 		}
-		System.out.println("Not Resumed");
 		return false;
 	}
 	
@@ -67,10 +65,8 @@ public class VmConnection {
 		if (!isSuspended()) {
 			vm.suspend();
 			eventManager.dispatch(new VmPauseEvent());
-			System.out.println("Paused");
 			return true;
 		}
-		System.out.println("Not Paused");
 		return false;
 	}
 	

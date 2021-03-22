@@ -2,6 +2,7 @@ package dev.binclub.bindbg.gui.components.state;
 
 import dev.binclub.bindbg.connection.VmConnection;
 import dev.binclub.bindbg.connection.event.VmPauseEvent;
+import dev.binclub.bindbg.event.StackFrameSelectedEvent;
 import dev.binclub.bindbg.gui.context.DebugContext;
 
 import javax.swing.*;
@@ -15,6 +16,7 @@ public class BytecodePanel extends JPanel {
 	
 	public BytecodePanel(VmConnection vm) {
 		this.vm = vm;
+		vm.eventManager.subscribe(this, StackFrameSelectedEvent.class, (e) -> refresh());
 	}
 	
 	public void refresh() {
@@ -23,9 +25,9 @@ public class BytecodePanel extends JPanel {
 		if (!vm.isSuspended()) return;
 		
 		try {
-			var context = vm.debugContext;
-			if (context.debuggingThread == null) return;
-			var loc = context.debuggingThread.frame(0).location();
+			var debuggingFrame = vm.debugContext.debuggingFrame;
+			if (debuggingFrame == null) return;
+			var loc = debuggingFrame.location();
 			var clazz = loc.declaringType();
 			var method = loc.method();
 			/*var cp = ConstantPoolParser.INSTANCE.parse(

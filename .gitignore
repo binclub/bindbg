@@ -5,4 +5,5 @@ target/
 .classpath
 .project
 dependency-reduced-pom.xml
+*.iml
 *.class

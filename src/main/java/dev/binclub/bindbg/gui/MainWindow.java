@@ -5,6 +5,7 @@ import com.sun.jdi.event.VMDisconnectEvent;
 import dev.binclub.bindbg.connection.VmConnection;
 import dev.binclub.bindbg.connection.event.VmPauseEvent;
 import dev.binclub.bindbg.connection.event.VmResumeEvent;
+import dev.binclub.bindbg.event.ThreadSelectedEvent;
 import dev.binclub.bindbg.gui.components.ControlBar;
 import dev.binclub.bindbg.gui.components.state.BytecodePanel;
 import dev.binclub.bindbg.gui.components.state.StatePanel;
@@ -39,6 +40,7 @@ public class MainWindow extends JFrame {
 		
 		vm.eventManager.subscribe(this, VmResumeEvent.class, (e) -> refresh());
 		vm.eventManager.subscribe(this, VmPauseEvent.class, (e) -> refresh());
+		vm.eventManager.subscribe(this, ThreadSelectedEvent.class, (e) -> refresh());
 		vm.eventManager.subscribe(this, VMDisconnectEvent.class, (e) -> close());
 		vm.eventManager.subscribe(this, VMDeathEvent.class, (e) -> close());
 		
@@ -52,9 +54,9 @@ public class MainWindow extends JFrame {
 	
 	private void close() {
 		System.out.println("Closing");
-		this.dispose();
 		
 		if (!purposefullyClosed) {
+			this.dispose();
 			var connWindow = new ConnectionWindow();
 			SwingUtils.putWindowInMouseScreen(connWindow, 350);
 			connWindow.setVisible(true);
@@ -63,8 +65,8 @@ public class MainWindow extends JFrame {
 	
 	@Override
 	public void dispose() {
-		super.dispose();
 		purposefullyClosed = true;
+		super.dispose();
 		vm.disconnect();
 	}
 }

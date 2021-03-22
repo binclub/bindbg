@@ -11,15 +11,6 @@ public class ConnectionWindow extends JFrame {
 	JTextField port = new JTextField();
 	
 	public ConnectionWindow() {
-		System.out.println(System.getProperty("java.version"));
-		
-		
-		var gs = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-		var gc = gs.getDefaultConfiguration();
-		System.out.println(gc);
-		System.out.println(gs);
-		System.out.println(gc.getDefaultTransform());
-		
 		this.setTitle("BinDbg");
 		this.setLayout(new BorderLayout());
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

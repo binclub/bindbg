@@ -2,6 +2,7 @@ package dev.binclub.bindbg.gui.components.state;
 
 import com.sun.jdi.StackFrame;
 import dev.binclub.bindbg.connection.VmConnection;
+import dev.binclub.bindbg.event.StackFrameSelectedEvent;
 
 import javax.swing.*;
 
@@ -28,9 +29,15 @@ public class StackFramePanel extends JPanel {
 		callStacks.setSelectionMode(SINGLE_SELECTION);
 		callStacks.setLayoutOrientation(VERTICAL);
 		callStacks.setVisibleRowCount(-1);
-		callStacks.addListSelectionListener((e) ->
-            vm.debugContext.debuggingFrame = callStacks.getSelectedValue()
-		);
+		callStacks.addListSelectionListener((e) -> {
+			var debugContext = vm.debugContext;
+			
+			var debuggingFrame = callStacks.getSelectedValue();
+			if (debuggingFrame != debugContext.debuggingFrame) {
+				debugContext.debuggingFrame = debuggingFrame;
+				vm.eventManager.dispatch(new StackFrameSelectedEvent(debuggingFrame));
+			}
+		});
 		callStacks.setCellRenderer(new DefaultListCellRenderer() {
 			@Override
 			public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -52,8 +59,8 @@ public class StackFramePanel extends JPanel {
 	}
 	
 	public void refresh() {
-		callStacks.setEnabled(false);
 		callStackModel.removeAllElements();
+		callStacks.setEnabled(false);
 		
 		try {
 			var thread = vm.debugContext.debuggingThread;
