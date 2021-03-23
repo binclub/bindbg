@@ -9,7 +9,7 @@ import java.net.URL;
  * Green = 1fa70a
  * Blue = 0f6ae5
  */
-public class BingaitIcons {
+public class BindbgIcons {
 	public static Image openFileIcon = load("openfile", 30, 30);
 	public static Image pauseIcon = load("pause", 30, 30);
 	public static Image pauseAltIcon = load("pause_alt", 30, 30);
@@ -24,7 +24,7 @@ public class BingaitIcons {
 	
 	private static Image load(String name, int width, int height) {
 		try {
-			URL url = BingaitIcons.class.getResource("/icons/" + name + ".png");
+			URL url = BindbgIcons.class.getResource("/icons/" + name + ".png");
 			return resize(ImageIO.read(url), width, height);
 		} catch (Exception e) {
 			throw new RuntimeException("Error loading BinGait icon '" + name + "'", e);

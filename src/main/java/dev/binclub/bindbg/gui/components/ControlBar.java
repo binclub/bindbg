@@ -3,8 +3,7 @@ package dev.binclub.bindbg.gui.components;
 import com.sun.jdi.ThreadReference;
 import dev.binclub.bindbg.connection.VmConnection;
 import dev.binclub.bindbg.event.ThreadSelectedEvent;
-import dev.binclub.bindbg.gui.BingaitIcons;
-import dev.binclub.bindbg.gui.MainWindow;
+import dev.binclub.bindbg.gui.BindbgIcons;
 import dev.binclub.bindbg.gui.components.generic.JSimpleButton;
 
 import javax.swing.*;
@@ -13,10 +12,10 @@ import java.awt.*;
 public class ControlBar extends JPanel {
 	private final VmConnection vm;
 	
-	private final ImageIcon pauseIcon = new ImageIcon(BingaitIcons.pauseIcon);
-	private final ImageIcon pauseAltIcon = new ImageIcon(BingaitIcons.pauseAltIcon);
-	private final ImageIcon resumeIcon = new ImageIcon(BingaitIcons.resumeIcon);
-	private final ImageIcon resumeAltIcon = new ImageIcon(BingaitIcons.resumeAltIcon);
+	private final ImageIcon pauseIcon = new ImageIcon(BindbgIcons.pauseIcon);
+	private final ImageIcon pauseAltIcon = new ImageIcon(BindbgIcons.pauseAltIcon);
+	private final ImageIcon resumeIcon = new ImageIcon(BindbgIcons.resumeIcon);
+	private final ImageIcon resumeAltIcon = new ImageIcon(BindbgIcons.resumeAltIcon);
 	
 	private final JSimpleButton terminateBtn;
 	private final JSimpleButton restartBtn;
@@ -33,12 +32,12 @@ public class ControlBar extends JPanel {
 		this.vm = vm;
 		this.setLayout(new FlowLayout());
 		
-		terminateBtn = new JSimpleButton(new ImageIcon(BingaitIcons.terminateIcon));
+		terminateBtn = new JSimpleButton(new ImageIcon(BindbgIcons.terminateIcon));
 		terminateBtn.setToolTipText("Terminate execution");
 		terminateBtn.setCallback(() -> vm.exit(1));
 		this.add(terminateBtn);
 		
-		restartBtn = new JSimpleButton(new ImageIcon(BingaitIcons.restartIcon));
+		restartBtn = new JSimpleButton(new ImageIcon(BindbgIcons.restartIcon));
 		restartBtn.setToolTipText("Restart execution");
 		restartBtn.setCallback(() -> {
 			System.out.println("Restart execution");
@@ -50,12 +49,12 @@ public class ControlBar extends JPanel {
 		pauseBtn.setCallback(vm::suspend);
 		this.add(pauseBtn);
 		
-		resumeBtn = new JSimpleButton(new ImageIcon(BingaitIcons.resumeIcon));
+		resumeBtn = new JSimpleButton(new ImageIcon(BindbgIcons.resumeIcon));
 		resumeBtn.setToolTipText("Resume execution");
 		resumeBtn.setCallback(vm::resume);
 		this.add(resumeBtn);
 		
-		singleStepBtn = new JSimpleButton(new ImageIcon(BingaitIcons.singleStepIcon));
+		singleStepBtn = new JSimpleButton(new ImageIcon(BindbgIcons.singleStepIcon));
 		singleStepBtn.setToolTipText("Single Step execution");
 		singleStepBtn.setCallback(() -> {
 			vm.suspend();
@@ -64,21 +63,21 @@ public class ControlBar extends JPanel {
 		});
 		this.add(singleStepBtn);
 		
-		stepOverBtn = new JSimpleButton(new ImageIcon(BingaitIcons.stepOverIcon));
+		stepOverBtn = new JSimpleButton(new ImageIcon(BindbgIcons.stepOverIcon));
 		stepOverBtn.setToolTipText("Step Over execution");
 		stepOverBtn.setCallback(() -> {
 			System.out.println("Step Over execution");
 		});
 		this.add(stepOverBtn);
 		
-		stepOutBtn = new JSimpleButton(new ImageIcon(BingaitIcons.stepOutIcon));
+		stepOutBtn = new JSimpleButton(new ImageIcon(BindbgIcons.stepOutIcon));
 		stepOutBtn.setToolTipText("Step Out execution");
 		stepOutBtn.setCallback(() -> {
 			System.out.println("Step Out execution");
 		});
 		this.add(stepOutBtn);
 		
-		stepJavaBtn = new JSimpleButton(new ImageIcon(BingaitIcons.stepJavaIcon));
+		stepJavaBtn = new JSimpleButton(new ImageIcon(BindbgIcons.stepJavaIcon));
 		stepJavaBtn.setToolTipText("Step Java execution");
 		stepJavaBtn.setCallback(() -> {
 			System.out.println("Step Java execution");
