@@ -3,6 +3,7 @@ package dev.binclub.bindbg.gui.components.state;
 import com.sun.jdi.StackFrame;
 import dev.binclub.bindbg.connection.VmConnection;
 import dev.binclub.bindbg.event.StackFrameSelectedEvent;
+import dev.binclub.bindbg.gui.components.generic.ListBackedListModel;
 
 import javax.swing.*;
 
@@ -18,13 +19,22 @@ import static javax.swing.ScrollPaneConstants.*;
  */
 public class StackFramePanel extends JPanel {
 	private final VmConnection vm;
-	private final DefaultListModel<StackFrame> callStackModel;
+	private final ListModel<StackFrame> callStackModel;
 	private final JList<StackFrame> callStacks;
 	
 	public StackFramePanel(VmConnection vm) {
 		this.vm = vm;
 		
-		this.callStackModel = new DefaultListModel<>();
+		this.callStackModel = new ListBackedListModel<>(() -> {
+			try {
+				var thread = vm.debugContext.debuggingThread;
+				if (thread == null || !vm.isSuspended()) return null;
+				
+				return thread.frames();
+			} catch (Throwable t) {
+				return null;
+			}
+		});
 		this.callStacks = new JList<>(callStackModel);
 		callStacks.setSelectionMode(SINGLE_SELECTION);
 		callStacks.setLayoutOrientation(VERTICAL);
@@ -59,28 +69,7 @@ public class StackFramePanel extends JPanel {
 	}
 	
 	public void refresh() {
-		callStackModel.removeAllElements();
-		callStacks.setEnabled(false);
-		
-		try {
-			var thread = vm.debugContext.debuggingThread;
-			if (thread == null || !vm.isSuspended()) return;
-			
-			var prevSelectedFrame = vm.debugContext.debuggingFrame;
-			vm.debugContext.debuggingFrame = null;
-			
-			var frames = thread.frames();
-			for (StackFrame frame : frames) {
-				callStackModel.addElement(frame);
-				
-				if (frame == prevSelectedFrame) {
-					vm.debugContext.debuggingFrame = frame;
-					callStacks.setSelectedValue(frame, true);
-				}
-			}
-			callStacks.setEnabled(true);
-		} catch (Throwable t) {
-			t.printStackTrace();
-		}
+		var thread = vm.debugContext.debuggingThread;
+		callStacks.setEnabled(thread != null && vm.isSuspended());
 	}
 }
