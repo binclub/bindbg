@@ -4,6 +4,7 @@ import com.sun.jdi.LocalVariable;
 import com.sun.jdi.StackFrame;
 import dev.binclub.bindbg.connection.VmConnection;
 import dev.binclub.bindbg.event.StackFrameSelectedEvent;
+import dev.binclub.bindbg.gui.components.generic.ListBackedListModel;
 
 import javax.swing.*;
 
@@ -18,15 +19,23 @@ import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
  */
 public class LocalVariablePanel extends JPanel {
 	private final VmConnection vm;
-	private final DefaultListModel<LocalVariable> variableModel;
+	private final ListModel<LocalVariable> variableModel;
 	private final JList<LocalVariable> variables;
 	
 	public LocalVariablePanel(VmConnection vm) {
 		this.vm = vm;
 		
-		this.variableModel = new DefaultListModel<>();
+		this.variableModel = new ListBackedListModel<>(() -> {
+			try {
+				var frame = vm.debugContext.debuggingFrame;
+				if (frame == null || !vm.isSuspended()) return null;
+				
+				return frame.visibleVariables();
+			} catch (Throwable t) {
+				return null;
+			}
+		});
 		this.variables = new JList<>(variableModel);
-		variables.setEnabled(false);
 		variables.setSelectionMode(SINGLE_SELECTION);
 		variables.setLayoutOrientation(VERTICAL);
 		variables.setVisibleRowCount(-1);
@@ -35,10 +44,9 @@ public class LocalVariablePanel extends JPanel {
 		variables.setCellRenderer(new DefaultListCellRenderer() {
 			@Override
 			public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-				var frame = (StackFrame) value;
-				var loc = frame.location();
-				var methodName = escapeNonAlphaNumeric(loc.method().toString());
-				return super.getListCellRendererComponent(list, methodName, index, isSelected, cellHasFocus);
+				var localVariable = (LocalVariable) value;
+				value = localVariable.name() + " " + localVariable.signature();
+				return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			}
 		});
 		

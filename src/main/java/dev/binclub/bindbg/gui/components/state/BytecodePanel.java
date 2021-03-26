@@ -1,15 +1,11 @@
 package dev.binclub.bindbg.gui.components.state;
 
 import dev.binclub.bindbg.connection.VmConnection;
-import dev.binclub.bindbg.connection.event.VmPauseEvent;
 import dev.binclub.bindbg.event.StackFrameSelectedEvent;
-import dev.binclub.bindbg.gui.context.DebugContext;
 
-import javax.swing.*;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import javax.swing.JPanel;
 
 public class BytecodePanel extends JPanel {
 	private final VmConnection vm;
@@ -36,7 +32,7 @@ public class BytecodePanel extends JPanel {
 			);
 			var version = new ClassVersion(clazz.minorVersion(), clazz.majorVersion());*/
 			var bytes = method.bytecodes();
-			File dbgFile = new File(clazz.name() + ".class");
+			var dbgFile = new File(clazz.name() + ".class");
 			System.out.println(dbgFile.getAbsolutePath());
 			try (var fs = new FileOutputStream(dbgFile)) {
 				fs.write(bytes);
