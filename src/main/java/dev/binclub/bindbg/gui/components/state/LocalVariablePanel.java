@@ -4,6 +4,7 @@ import com.sun.jdi.LocalVariable;
 import com.sun.jdi.StackFrame;
 import dev.binclub.bindbg.connection.VmConnection;
 import dev.binclub.bindbg.event.StackFrameSelectedEvent;
+import dev.binclub.bindbg.gui.components.generic.ListBackedListModel;
 
 import javax.swing.*;
 
@@ -18,13 +19,23 @@ import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
  */
 public class LocalVariablePanel extends JPanel {
 	private final VmConnection vm;
-	private final DefaultListModel<LocalVariable> variableModel;
+	private final ListModel<LocalVariable> variableModel;
 	private final JList<LocalVariable> variables;
 	
 	public LocalVariablePanel(VmConnection vm) {
 		this.vm = vm;
 		
-		this.variableModel = new DefaultListModel<>();
+		this.variableModel = new ListBackedListModel<>(() -> {
+			try {
+				var frame = vm.debugContext.debuggingFrame;
+				if (frame == null || !vm.isSuspended()) return null;
+				
+				return frame.visibleVariables();
+			} catch (Throwable t) {
+				t.printStackTrace();
+				return null;
+			}
+		});
 		this.variables = new JList<>(variableModel);
 		variables.setEnabled(false);
 		variables.setSelectionMode(SINGLE_SELECTION);
@@ -50,5 +61,10 @@ public class LocalVariablePanel extends JPanel {
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		this.setLayout(new BorderLayout());
 		this.add(scrollPane, BorderLayout.CENTER);
+	}
+	
+	public void refresh() {
+		var frame = vm.debugContext.debuggingFrame;
+		variables.setEnabled(frame != null && vm.isSuspended());
 	}
 }

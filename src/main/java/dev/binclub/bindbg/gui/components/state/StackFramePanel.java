@@ -12,7 +12,6 @@ import java.awt.*;
 import static dev.binclub.bindbg.util.StringUtils.escapeNonAlphaNumeric;
 import static javax.swing.JList.VERTICAL;
 import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
-import static javax.swing.ScrollPaneConstants.*;
 
 /**
  * Shows the JVM call stack
@@ -32,6 +31,7 @@ public class StackFramePanel extends JPanel {
 				
 				return thread.frames();
 			} catch (Throwable t) {
+				t.printStackTrace();
 				return null;
 			}
 		});

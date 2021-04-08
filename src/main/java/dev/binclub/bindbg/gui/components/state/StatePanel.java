@@ -1,5 +1,5 @@
 package dev.binclub.bindbg.gui.components.state;
-
+t
 import dev.binclub.bindbg.connection.VmConnection;
 import com.github.weisj.darklaf.components.tabframe.JTabFrame;
 import com.github.weisj.darklaf.util.Alignment;
@@ -12,13 +12,16 @@ import com.github.weisj.darklaf.util.Alignment;
 public class StatePanel extends JTabFrame {
 	private final BytecodePanel bytecode;
 	private final StackFramePanel stack;
+	private final LocalVariablePanel variables;
 	
 	public StatePanel(VmConnection vm) {
 		bytecode = new BytecodePanel(vm);
 		stack = new StackFramePanel(vm);
+		variables = new LocalVariablePanel(vm);
 		
 		this.setContent(bytecode); // the center content
-		this.addTab(stack, "StackFrames", Alignment.SOUTH_WEST);
+		this.addTab(stack, "Call Stack", Alignment.SOUTH_WEST);
+		this.addTab(variables, "Local Variables", Alignment.SOUTH_EAST);
 	}
 	
 	public void refresh() {
