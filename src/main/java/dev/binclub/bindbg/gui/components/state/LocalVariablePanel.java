@@ -46,10 +46,9 @@ public class LocalVariablePanel extends JPanel {
 		variables.setCellRenderer(new DefaultListCellRenderer() {
 			@Override
 			public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-				var frame = (StackFrame) value;
-				var loc = frame.location();
-				var methodName = escapeNonAlphaNumeric(loc.method().toString());
-				return super.getListCellRendererComponent(list, methodName, index, isSelected, cellHasFocus);
+				var localVariable = (LocalVariable) value;
+				value = localVariable.name() + " " + localVariable.signature();
+				return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			}
 		});
 		
