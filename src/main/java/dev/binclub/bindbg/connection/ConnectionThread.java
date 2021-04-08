@@ -17,6 +17,8 @@
 
 package dev.binclub.bindbg.connection;
 
+import com.sun.jdi.VMDisconnectedException;
+
 public class ConnectionThread extends Thread {
 	private final VmConnection vm;
 	
@@ -37,20 +39,26 @@ public class ConnectionThread extends Thread {
 				if (!active) break;
 				
 				// We can still have some queued events even if the vm is dead
-				for (var event : vm.pollEvents(1000)) {
-					vm.eventManager.dispatch(event);
+				var events = vm.pollEvents(1000);
+				if (events != null) {
+					for (var event : events) {
+						vm.eventManager.dispatch(event);
+					}
 				}
 				
 				if (vm.isDead()) {
 					active = false;
 					break;
 				}
+			} catch (VMDisconnectedException e) {
+				active = false;
+				break;
 			} catch (Throwable t) {
 				t.printStackTrace();
 			}
 			
 			if (Thread.interrupted()) {
-				this.active = false;
+				active = false;
 				break;
 			}
 		}

@@ -17,6 +17,7 @@
 
 package dev.binclub.bindbg.gui.components.state;
 
+import com.sun.jdi.AbsentInformationException;
 import com.sun.jdi.LocalVariable;
 import dev.binclub.bindbg.connection.VmConnection;
 import dev.binclub.bindbg.gui.components.generic.ListBackedListModel;
@@ -39,13 +40,18 @@ public class LocalVariablePanel extends JPanel {
 		this.vm = vm;
 		
 		this.variableModel = new ListBackedListModel<>(() -> {
+			var frame = vm.debugContext.debuggingFrame;
+			if (frame == null || !vm.isSuspended()) return null;
+			var method = frame.location().method();
+			if (method.isNative()) return null; // cant get variables for a native method
 			try {
-				var frame = vm.debugContext.debuggingFrame;
-				if (frame == null || !vm.isSuspended()) return null;
-				
 				return frame.visibleVariables();
+			} catch (AbsentInformationException e) {
+				// Variable information was not present, likely due to obfuscation
+				// TODO: Gui info about this
+				return null;
 			} catch (Throwable t) {
-				t.printStackTrace();
+				new RuntimeException("Couldn't fetch variables for " + frame.toString(), t).printStackTrace();
 				return null;
 			}
 		});
