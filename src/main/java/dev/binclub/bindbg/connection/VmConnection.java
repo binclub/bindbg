@@ -1,7 +1,7 @@
 package dev.binclub.bindbg.connection;
 
 import com.sun.jdi.*;
-import com.sun.jdi.connect.IllegalConnectorArgumentsException;
+import com.sun.jdi.connect.*;
 import com.sun.jdi.event.Event;
 import com.sun.jdi.request.EventRequest;
 import com.sun.jdi.request.StepRequest;
@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static dev.binclub.bindbg.connection.VmUtils.connect;
@@ -27,8 +27,8 @@ public class VmConnection {
 	private final VirtualMachine vm;
 	private final VMState state;
 	
-	public VmConnection(String host, int port) throws IOException, IllegalConnectorArgumentsException {
-		vm = connect(host, port);
+	public VmConnection(Connector conn, Map<String,? extends Connector.Argument> arguments) throws Throwable {
+		vm = connect(conn, arguments);
 		state = VMState.get(vm);
 		debugContext = new DebugContext();
 		conThread = new ConnectionThread(this);

@@ -2,38 +2,28 @@ package dev.binclub.bindbg.connection;
 
 import com.sun.jdi.Bootstrap;
 import com.sun.jdi.VirtualMachine;
-import com.sun.jdi.connect.AttachingConnector;
-import com.sun.jdi.connect.IllegalConnectorArgumentsException;
+import com.sun.jdi.connect.*;
 
-import java.io.IOException;
+import java.util.*;
 
 public class VmUtils {
-	static VirtualMachine connect(String host, int port) throws IOException, IllegalConnectorArgumentsException {
-		var connector = getConnector("com.sun.jdi.SocketAttach");
-		
-		var args = connector.defaultArguments();
-		args.get("hostname").setValue(host);
-		args.get("port").setValue(Integer.toString(port));
-		
-		return connector.attach(args);
-	}
-	
-	static VirtualMachine connect(int pid) throws IOException, IllegalConnectorArgumentsException {
-		var connector = getConnector("com.sun.jdi.ProcessAttach");
-		
-		var args = connector.defaultArguments();
-		args.get("pid").setValue(Integer.toString(pid));
-		
-		return connector.attach(args);
-	}
-	
-	static AttachingConnector getConnector(String name) {
-		var vmManager = Bootstrap.virtualMachineManager();
-		
-		for (var connector : vmManager.attachingConnectors()) {
-			if(name.equals(connector.name()))
-				return connector;
+	static VirtualMachine connect(Connector conn, Map<String,? extends Connector.Argument> arguments) throws Throwable {
+		if (conn instanceof AttachingConnector) {
+			var aConn = (AttachingConnector) conn;
+			return aConn.attach(arguments);
+		} else if (conn instanceof LaunchingConnector) {
+			var lConn = (LaunchingConnector) conn;
+			return lConn.launch(arguments);
+		} else {
+			throw new UnsupportedOperationException("Connector " + conn.getClass());
 		}
-		throw new IllegalStateException("Couldn't find connector with name '" + name + "'");
+	}
+	
+	public static List<Connector> connectors() {
+		List<Connector> connectors = new ArrayList();
+		var manager = Bootstrap.virtualMachineManager();
+		connectors.addAll(manager.attachingConnectors());
+		connectors.addAll(manager.launchingConnectors());
+		return connectors;
 	}
 }
