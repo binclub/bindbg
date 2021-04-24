@@ -1,16 +1,30 @@
+/*
+ * This file is part of BinDbg.
+ *
+ * BinDbg is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * BinDbg is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with BinDbg.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package dev.binclub.bindbg.gui.components.state;
 
+import com.sun.jdi.AbsentInformationException;
 import com.sun.jdi.LocalVariable;
-import com.sun.jdi.StackFrame;
 import dev.binclub.bindbg.connection.VmConnection;
-import dev.binclub.bindbg.event.StackFrameSelectedEvent;
 import dev.binclub.bindbg.gui.components.generic.ListBackedListModel;
 
 import javax.swing.*;
-
 import java.awt.*;
 
-import static dev.binclub.bindbg.util.StringUtils.escapeNonAlphaNumeric;
 import static javax.swing.JList.VERTICAL;
 import static javax.swing.ListSelectionModel.SINGLE_SELECTION;
 
@@ -26,16 +40,23 @@ public class LocalVariablePanel extends JPanel {
 		this.vm = vm;
 		
 		this.variableModel = new ListBackedListModel<>(() -> {
+			var frame = vm.debugContext.debuggingFrame;
+			if (frame == null || !vm.isSuspended()) return null;
+			var method = frame.location().method();
+			if (method.isNative()) return null; // cant get variables for a native method
 			try {
-				var frame = vm.debugContext.debuggingFrame;
-				if (frame == null || !vm.isSuspended()) return null;
-				
 				return frame.visibleVariables();
+			} catch (AbsentInformationException e) {
+				// Variable information was not present, likely due to obfuscation
+				// TODO: Gui info about this
+				return null;
 			} catch (Throwable t) {
+				new RuntimeException("Couldn't fetch variables for " + frame.toString(), t).printStackTrace();
 				return null;
 			}
 		});
 		this.variables = new JList<>(variableModel);
+		variables.setEnabled(false);
 		variables.setSelectionMode(SINGLE_SELECTION);
 		variables.setLayoutOrientation(VERTICAL);
 		variables.setVisibleRowCount(-1);
@@ -58,5 +79,10 @@ public class LocalVariablePanel extends JPanel {
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		this.setLayout(new BorderLayout());
 		this.add(scrollPane, BorderLayout.CENTER);
+	}
+	
+	public void refresh() {
+		var frame = vm.debugContext.debuggingFrame;
+		variables.setEnabled(frame != null && vm.isSuspended());
 	}
 }
