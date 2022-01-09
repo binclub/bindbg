@@ -60,6 +60,28 @@ public class ConnectionWindow extends JFrame {
 				mainWindow.setVisible(true);
 			}
 		});
+		var showVMs = new JButton("Show running VM's");
+		showVMs.addActionListener(e -> {
+			JFrame runningVMs = new JFrame("JVMs:");
+			runningVMs.setLayout(new BorderLayout());
+			JTextArea jta = new JTextArea();
+			JScrollPane sp = new JScrollPane(jta);
+			jta.setEditable(false);
+			String content = "";
+			for(String index : VMUtil.listVirtualMachines()) {
+				content = content + index;
+				if(!index.equals(VMUtil.listVirtualMachines().get(VMUtil.listVirtualMachines().size() - 1))) {
+					content = content + System.lineSeparator();
+				}
+			}
+			jta.setText(content);
+
+			runningVMs.getContentPane().add(sp, BorderLayout.CENTER);
+			runningVMs.setSize(400, (int) (runningVMs.preferredSize().height * 1.5));
+			runningVMs.setLocationRelativeTo(null);
+			runningVMs.setVisible(true);
+		});
+		this.add(showVMs, BorderLayout.EAST);
 		this.add(connectBtn, BorderLayout.SOUTH);
 	}
 	
