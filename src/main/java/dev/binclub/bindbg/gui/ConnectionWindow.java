@@ -31,7 +31,7 @@ public class ConnectionWindow extends JFrame {
 	public ConnectionWindow() {
 		this.setTitle("BinDbg");
 		this.setLayout(new BorderLayout());
-		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		var tabPane = new JTabbedPane();
 		for (var conn : VmUtils.connectors()) {
@@ -60,6 +60,28 @@ public class ConnectionWindow extends JFrame {
 				mainWindow.setVisible(true);
 			}
 		});
+		var showVMs = new JButton("Show running VM's");
+		showVMs.addActionListener(e -> {
+			JFrame runningVMs = new JFrame("JVMs:");
+			runningVMs.setLayout(new BorderLayout());
+			JTextArea jta = new JTextArea();
+			JScrollPane sp = new JScrollPane(jta);
+			jta.setEditable(false);
+			String content = "";
+			for(String index : VmUtils.listVirtualMachines()) {
+				content = new StringBuilder().append(content).append(index).toString();
+				if(!index.equals(VmUtils.listVirtualMachines().get(VmUtils.listVirtualMachines().size() - 1))) {
+					content = new StringBuilder().append(content).append(System.lineSeparator()).toString();
+				}
+			}
+			jta.setText(content);
+
+			runningVMs.getContentPane().add(sp, BorderLayout.CENTER);
+			runningVMs.setSize(400, (int) (runningVMs.preferredSize().height * 1.5));
+			runningVMs.setLocationRelativeTo(null);
+			runningVMs.setVisible(true);
+		});
+		this.add(showVMs, BorderLayout.EAST);
 		this.add(connectBtn, BorderLayout.SOUTH);
 	}
 	

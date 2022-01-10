@@ -20,10 +20,12 @@ package dev.binclub.bindbg.connection;
 import com.sun.jdi.Bootstrap;
 import com.sun.jdi.VirtualMachine;
 import com.sun.jdi.connect.*;
+import com.sun.tools.attach.VirtualMachineDescriptor;
 
 import java.util.*;
 
 public class VmUtils {
+	
 	static VirtualMachine connect(Connector conn, Map<String,? extends Connector.Argument> arguments) throws Throwable {
 		if (conn instanceof AttachingConnector) {
 			var aConn = (AttachingConnector) conn;
@@ -43,4 +45,19 @@ public class VmUtils {
 		connectors.addAll(manager.launchingConnectors());
 		return connectors;
 	}
+	
+	public static List<String> listVirtualMachines() {
+		List<String> vms = new ArrayList();
+		try {
+			List<VirtualMachineDescriptor> descriptors = com.sun.tools.attach.VirtualMachine.list();
+			for (VirtualMachineDescriptor descriptor : descriptors) {
+				vms.add("(pid: " + descriptor.id() + ") " + descriptor.displayName());
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+		return vms;
+	}
+	
 }
