@@ -31,7 +31,7 @@ public class ConnectionWindow extends JFrame {
 	public ConnectionWindow() {
 		this.setTitle("BinDbg");
 		this.setLayout(new BorderLayout());
-		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		var tabPane = new JTabbedPane();
 		for (var conn : VmUtils.connectors()) {
@@ -68,10 +68,10 @@ public class ConnectionWindow extends JFrame {
 			JScrollPane sp = new JScrollPane(jta);
 			jta.setEditable(false);
 			String content = "";
-			for(String index : VMUtil.listVirtualMachines()) {
-				content = content + index;
-				if(!index.equals(VMUtil.listVirtualMachines().get(VMUtil.listVirtualMachines().size() - 1))) {
-					content = content + System.lineSeparator();
+			for(String index : VmUtils.listVirtualMachines()) {
+				content = new StringBuilder().append(content).append(index).toString();
+				if(!index.equals(VmUtils.listVirtualMachines().get(VmUtils.listVirtualMachines().size() - 1))) {
+					content = new StringBuilder().append(content).append(System.lineSeparator()).toString();
 				}
 			}
 			jta.setText(content);
