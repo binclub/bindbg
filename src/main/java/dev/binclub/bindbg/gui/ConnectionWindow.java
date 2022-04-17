@@ -26,6 +26,8 @@ import java.awt.*;
 import java.util.Map;
 import java.text.NumberFormat;
 import com.sun.jdi.connect.*;
+import java.util.Arrays;
+import java.util.Objects;
 
 public class ConnectionWindow extends JFrame {
 	public ConnectionWindow() {
@@ -43,7 +45,23 @@ public class ConnectionWindow extends JFrame {
 		var connectBtn = new JButton("Connect");
 		connectBtn.addActionListener(e -> {
 			var connector = (ConnectorPanel) tabPane.getSelectedComponent();
-			
+			Arrays.stream(Objects.requireNonNull(Arrays.stream(connector.getComponents())
+									.filter(component -> component instanceof JPanel)
+									.map(component -> (JPanel) component)
+									.findFirst().orElse(null))
+							.getComponents())
+					.forEach(component -> {
+						if (component instanceof JCheckBox) {
+							Arrays.stream(((JCheckBox) component).getActionListeners())
+									.forEach(listener -> listener.actionPerformed(null));
+						} else if (component instanceof JTextField) {
+							Arrays.stream(((JTextField) component).getActionListeners())
+									.forEach(listener -> listener.actionPerformed(null));
+						} else if (component instanceof JComboBox) {
+							Arrays.stream(((JComboBox<?>) component).getActionListeners())
+									.forEach(listener -> listener.actionPerformed(null));
+						}
+					});
 			VmConnection connection = null;
 			try {
 				connection = new VmConnection(connector.connector, connector.arguments);
